@@ -77,7 +77,7 @@ class Builder(object):
         self.cflags = ''
         if 'name' in obj:
             CPrint.header('Project name {}'.format(obj['name']))
-        if 'builder' in object:
+        if 'builder' in obj:
             self.builder = obj['builder']
         if 'build_type' in obj:
             self.build_type = obj['build_type']
