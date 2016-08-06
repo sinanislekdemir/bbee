@@ -226,7 +226,7 @@ else:
      # check of capul.json
     if not os.path.isfile('capul.json'):
         CPrint.fail("capul.json file not found \n")
-    exit(2)
+        exit(2)
     b = Builder('capul.json')
 
 if 'help' in argsdict:
