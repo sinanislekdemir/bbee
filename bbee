@@ -75,6 +75,8 @@ class Builder(object):
         self.output_dir = '.'
         self.output_name = 'output'
         self.cflags = ''
+        self.debug = False
+        self.source_extension = '.c'
         if 'name' in obj:
             CPrint.header('Project name {}'.format(obj['name']))
         if 'builder' in obj:
@@ -95,6 +97,10 @@ class Builder(object):
             self.output_name = obj['output_name']
         if 'cflags' in obj:
             self.cflags = obj['cflags']
+        if 'debug' in obj:
+            self.debug = obj['debug']
+        if 'source_extension' in obj:
+            self.source_extension = obj['source_extension']
 
     def clean(self):
         CPrint.okg("Cleaning files \n")
@@ -103,13 +109,19 @@ class Builder(object):
                 ls = os.listdir(source)
                 for f in ls:
                     files.append(source + '/' + f)
+                    if self.debug:
+                        print "Find: [{}/{}]\n".format(source, f)
             if os.path.isfile(source):
                 files.append(source)
+                if self.debug:
+                    print "Find [{}]\n".format(source)
         obj_files = []
         for file in files:
-            if not file.endswith('.c'):
+            if not file.endswith(self.source_extension):
                 continue
             os.remove(file + '.o')
+            if self.debug:
+                print "Remove [{}]\n".format(file)
 
     def build_c(self):
         files = []
@@ -118,12 +130,16 @@ class Builder(object):
             if os.path.isdir(source):
                 ls = os.listdir(source)
                 for f in ls:
+                    if self.debug:
+                        print "Add: {}/{}\n".format(source, f)
                     files.append(source + '/' + f)
             if os.path.isfile(source):
                 files.append(source)
+                if self.debug:
+                    print "Add [{}]\n".format(source)
         obj_files = []
         for file in files:
-            if not file.endswith('.c'):
+            if not file.endswith(self.source_extension):
                 continue
             command = ''
             command = self.builder
@@ -134,6 +150,8 @@ class Builder(object):
             for inc in self.includes:
                 command += ' -I"' + inc + '"'
             print "Building {} \n".format(file)
+            if self.debug:
+                print "{}\n".format(command)
             call = subprocess.call(command, shell=True)
             if call > 0:
                 CPrint.fail("Failed with {}".format(call))
@@ -147,6 +165,8 @@ class Builder(object):
                 command += ' -L"' + lib + '"'
             for lib in self.libraries:
                 command += ' -l' + lib
+            if self.debug:
+                print "{}\n".format(command)
             call = subprocess.call(command, shell=True)
 
             if call > 0:
@@ -156,6 +176,8 @@ class Builder(object):
             command = 'ar -cvq "{}/{}" '.format(self.output_dir,
                                                 self.output_name)
             command += ' '.join(obj_files)
+            if self.debug:
+                print "{}\n".format(command)
             call = subprocess.call(command, shell=True)
             if call > 0:
                 CPrint.fail('Failed with {}'.format(call))

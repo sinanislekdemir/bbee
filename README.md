@@ -33,7 +33,9 @@ Here is a sample capul.json file
         "output": "binary",
         "output_dir": "build",
         "output_name": "hello_world",
-        "cflags": ""
+        "cflags": "",
+        "debug": true,
+        "source_extension": ".c"
     }
 
 Note: just "sources", "output" fields are mandatory, others are optional.
