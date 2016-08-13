@@ -77,6 +77,7 @@ class Builder(object):
         self.cflags = ''
         self.debug = False
         self.source_extension = '.c'
+        self.run_after_build = False
         if 'name' in obj:
             CPrint.header('Project name {}'.format(obj['name']))
         if 'builder' in obj:
@@ -101,42 +102,45 @@ class Builder(object):
             self.debug = obj['debug']
         if 'source_extension' in obj:
             self.source_extension = obj['source_extension']
+        if 'run_after_build' in obj:
+            self.run_after_build = obj['run_after_build']
 
     def clean(self):
-        CPrint.okg("Cleaning files \n")
+        files = []
+        CPrint.okg("Cleaning files ")
         for source in self.sources:
             if os.path.isdir(source):
                 ls = os.listdir(source)
                 for f in ls:
                     files.append(source + '/' + f)
                     if self.debug:
-                        print "Find: [{}/{}]\n".format(source, f)
+                        print "Find: [{}/{}]".format(source, f)
             if os.path.isfile(source):
                 files.append(source)
                 if self.debug:
-                    print "Find [{}]\n".format(source)
+                    print "Find [{}]".format(source)
         obj_files = []
         for file in files:
             if not file.endswith(self.source_extension):
                 continue
             os.remove(file + '.o')
             if self.debug:
-                print "Remove [{}]\n".format(file)
+                print "Remove [{}]".format(file + '.o')
 
     def build_c(self):
         files = []
-        CPrint.okg("Collecting files \n")
+        CPrint.okg("Collecting files ")
         for source in self.sources:
             if os.path.isdir(source):
                 ls = os.listdir(source)
                 for f in ls:
                     if self.debug:
-                        print "Add: {}/{}\n".format(source, f)
+                        print "Add: {}/{}".format(source, f)
                     files.append(source + '/' + f)
             if os.path.isfile(source):
                 files.append(source)
                 if self.debug:
-                    print "Add [{}]\n".format(source)
+                    print "Add [{}]".format(source)
         obj_files = []
         for file in files:
             if not file.endswith(self.source_extension):
@@ -149,9 +153,9 @@ class Builder(object):
             obj_files.append(file + '.o')
             for inc in self.includes:
                 command += ' -I"' + inc + '"'
-            print "Building {} \n".format(file)
+            print "Building {} ".format(file)
             if self.debug:
-                print "{}\n".format(command)
+                print "{}".format(command)
             call = subprocess.call(command, shell=True)
             if call > 0:
                 CPrint.fail("Failed with {}".format(call))
@@ -166,18 +170,21 @@ class Builder(object):
             for lib in self.libraries:
                 command += ' -l' + lib
             if self.debug:
-                print "{}\n".format(command)
+                print "{}".format(command)
             call = subprocess.call(command, shell=True)
 
             if call > 0:
                 CPrint.fail('Failed with {}'.format(call))
                 exit(127)
+            if self.run_after_build:
+                print "Running {}/{}".format(self.output_dir, self.output_name)
+                os.system("{}/{}".format(self.output_dir, self.output_name))
         if self.output == 'library':
             command = 'ar -cvq "{}/{}" '.format(self.output_dir,
                                                 self.output_name)
             command += ' '.join(obj_files)
             if self.debug:
-                print "{}\n".format(command)
+                print "{}".format(command)
             call = subprocess.call(command, shell=True)
             if call > 0:
                 CPrint.fail('Failed with {}'.format(call))
@@ -225,7 +232,7 @@ if 'i' in argsdict:
 else:
      # check of capul.json
     if not os.path.isfile('capul.json'):
-        CPrint.fail("capul.json file not found \n")
+        CPrint.fail("capul.json file not found ")
         exit(2)
     b = Builder('capul.json')
 

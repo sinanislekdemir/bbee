@@ -35,7 +35,8 @@ Here is a sample capul.json file
         "output_name": "hello_world",
         "cflags": "",
         "debug": true,
-        "source_extension": ".c"
+        "source_extension": ".c",
+        "run_after_build": False
     }
 
 Note: just "sources", "output" fields are mandatory, others are optional.
