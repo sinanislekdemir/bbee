@@ -123,7 +123,8 @@ class Builder(object):
         for file in files:
             if not file.endswith(self.source_extension):
                 continue
-            os.remove(file + '.o')
+            if os.path.isfile(file + '.o'):
+                os.remove(file + '.o')
             if self.debug:
                 print "Remove [{}]".format(file + '.o')
 
@@ -178,7 +179,8 @@ class Builder(object):
                 exit(127)
             if self.run_after_build:
                 print "Running {}/{}".format(self.output_dir, self.output_name)
-                os.system("{}/{}".format(self.output_dir, self.output_name))
+                os.system("cd {} && ./{} && cd ..".format(self.output_dir,
+                                                        self.output_name))
         if self.output == 'library':
             command = 'ar -cvq "{}/{}" '.format(self.output_dir,
                                                 self.output_name)
