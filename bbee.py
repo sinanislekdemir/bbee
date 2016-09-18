@@ -178,9 +178,7 @@ class Builder(object):
                 CPrint.fail('Failed with {}'.format(call))
                 exit(127)
             if self.run_after_build:
-                print "Running {}/{}".format(self.output_dir, self.output_name)
-                os.system("cd {} && ./{} && cd ..".format(self.output_dir,
-                                                        self.output_name))
+                self.exec()
         if self.output == 'library':
             command = 'ar -cvq "{}/{}" '.format(self.output_dir,
                                                 self.output_name)
@@ -191,6 +189,11 @@ class Builder(object):
             if call > 0:
                 CPrint.fail('Failed with {}'.format(call))
                 exit(127)
+
+    def exec(self):
+        print "Running {}/{}".format(self.output_dir, self.output_name)
+        os.system("cd {} && ./{} && cd ..".format(self.output_dir,
+                                                  self.output_name))
 
     def run(self):
         CPrint.ok("Building using {}".format(self.builder))
@@ -206,6 +209,7 @@ def help():
         -------------------------------------------------------
         --i=capul.json input capul file
         --output=directory set output directory
+        --run only run output without building
         --help show this help text
         --version shows version
         """)
@@ -232,7 +236,7 @@ for farg in sys.argv:
 if 'i' in argsdict:
     b = Builder(argsdict['i'][0])
 else:
-     # check of capul.json
+    # check of capul.json
     if not os.path.isfile('capul.json'):
         CPrint.fail("capul.json file not found ")
         exit(2)
@@ -243,6 +247,10 @@ if 'help' in argsdict:
 
 if 'clean' in argsdict:
     b.clean()
+    exit(0)
+
+if 'run' in argsdict:
+    b.exec()
     exit(0)
 
 b.run()
