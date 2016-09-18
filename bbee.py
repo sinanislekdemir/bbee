@@ -178,7 +178,8 @@ class Builder(object):
                 CPrint.fail('Failed with {}'.format(call))
                 exit(127)
             if self.run_after_build:
-                self.exec()
+                self.exec_bin()
+
         if self.output == 'library':
             command = 'ar -cvq "{}/{}" '.format(self.output_dir,
                                                 self.output_name)
@@ -190,7 +191,7 @@ class Builder(object):
                 CPrint.fail('Failed with {}'.format(call))
                 exit(127)
 
-    def exec(self):
+    def exec_bin(self):
         print "Running {}/{}".format(self.output_dir, self.output_name)
         os.system("cd {} && ./{} && cd ..".format(self.output_dir,
                                                   self.output_name))
@@ -250,7 +251,7 @@ if 'clean' in argsdict:
     exit(0)
 
 if 'run' in argsdict:
-    b.exec()
+    b.exec_bin()
     exit(0)
 
 b.run()
