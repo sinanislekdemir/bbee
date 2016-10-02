@@ -150,6 +150,8 @@ class Builder(object):
             command = self.builder
             command += ' -c "' + file + '"'
             command += ' -o "' + file + '.o"'
+            if type(self.cflags) is list:
+                self.cflags = ' '.join(self.cflags)
             command += ' ' + self.cflags
             obj_files.append(file + '.o')
             for inc in self.includes:
