@@ -34,23 +34,23 @@ class bcolors:
 class CPrint:
     @staticmethod
     def header(msg):
-        print bcolors.HEADER + msg + bcolors.ENDC
+        print(bcolors.HEADER + msg + bcolors.ENDC)
 
     @staticmethod
     def ok(msg):
-        print bcolors.OKBLUE + msg + bcolors.ENDC
+        print(bcolors.OKBLUE + msg + bcolors.ENDC)
 
     @staticmethod
     def okg(msg):
-        print bcolors.OKGREEN + msg + bcolors.ENDC
+        print(bcolors.OKGREEN + msg + bcolors.ENDC)
 
     @staticmethod
     def warning(msg):
-        print bcolors.WARNING + msg + bcolors.ENDC
+        print(bcolors.WARNING + msg + bcolors.ENDC)
 
     @staticmethod
     def fail(msg):
-        print bcolors.FAIL + msg + bcolors.ENDC
+        print(bcolors.FAIL + msg + bcolors.ENDC)
 
 
 # Main builder class
@@ -114,19 +114,18 @@ class Builder(object):
                 for f in ls:
                     files.append(source + '/' + f)
                     if self.debug:
-                        print "Find: [{}/{}]".format(source, f)
+                        print("Find: [{}/{}]".format(source, f))
             if os.path.isfile(source):
                 files.append(source)
                 if self.debug:
-                    print "Find [{}]".format(source)
-        obj_files = []
+                    print("Find [{}]".format(source))
         for file in files:
             if not file.endswith(self.source_extension):
                 continue
             if os.path.isfile(file + '.o'):
                 os.remove(file + '.o')
             if self.debug:
-                print "Remove [{}]".format(file + '.o')
+                print("Remove [{}]".format(file + '.o'))
 
     def build_c(self):
         files = []
@@ -136,12 +135,12 @@ class Builder(object):
                 ls = os.listdir(source)
                 for f in ls:
                     if self.debug:
-                        print "Add: {}/{}".format(source, f)
+                        print("Add: {}/{}".format(source, f))
                     files.append(source + '/' + f)
             if os.path.isfile(source):
                 files.append(source)
                 if self.debug:
-                    print "Add [{}]".format(source)
+                    print("Add [{}]".format(source))
         obj_files = []
         for file in files:
             if not file.endswith(self.source_extension):
@@ -156,9 +155,9 @@ class Builder(object):
             obj_files.append(file + '.o')
             for inc in self.includes:
                 command += ' -I"' + inc + '"'
-            print "Building {} ".format(file)
+            print("Building {} ".format(file))
             if self.debug:
-                print "{}".format(command)
+                print("{}".format(command))
             call = subprocess.call(command, shell=True)
             if call > 0:
                 CPrint.fail("Failed with {}".format(call))
@@ -173,7 +172,7 @@ class Builder(object):
             for lib in self.libraries:
                 command += ' -l' + lib
             if self.debug:
-                print "{}".format(command)
+                print("{}".format(command))
             call = subprocess.call(command, shell=True)
 
             if call > 0:
@@ -187,14 +186,14 @@ class Builder(object):
                                                 self.output_name)
             command += ' '.join(obj_files)
             if self.debug:
-                print "{}".format(command)
+                print("{}".format(command))
             call = subprocess.call(command, shell=True)
             if call > 0:
                 CPrint.fail('Failed with {}'.format(call))
                 exit(127)
 
     def exec_bin(self):
-        print "Running {}/{}".format(self.output_dir, self.output_name)
+        print("Running {}/{}".format(self.output_dir, self.output_name))
         os.system("cd {} && ./{} && cd ..".format(self.output_dir,
                                                   self.output_name))
 
@@ -206,17 +205,42 @@ class Builder(object):
 
 def help():
     import textwrap
-    print textwrap.dedent("""\
+    print(textwrap.dedent("""\
         Build system by Sinan ISLEKDEMIR - sinan@islekdemir.com
         Parameters:
         -------------------------------------------------------
+        --create create an empty C project here
+        --create++ create an empty C++ project here
         --i=capul.json input capul file
         --output=directory set output directory
         --run only run output without building
         --help show this help text
         --version shows version
-        """)
+        """))
     exit(0)
+
+
+def create_project(prefix=''):
+    os.mkdir('sources')
+    os.mkdir('includes')
+    os.mkdir('build')
+    with open('README.md', 'w') as f:
+        f.write("# bbee project\n")
+    with open('capul.json', 'w') as f:
+        data = {'name': 'Example Project',
+                'builder': 'gcc',
+                'sources': ['./sources'],
+                'includes': ['./includes'],
+                'libraries': [],
+                'library_search_paths': [],
+                'output': 'binary',
+                'output_dir': 'build',
+                'output_name': 'example',
+                'cflags': '',
+                'debug': True,
+                'source_extension': '.c%s' % prefix,
+                'run_after_build': True}
+        f.write(json.dumps(data))
 
 argsdict = {}
 
@@ -236,12 +260,21 @@ for farg in sys.argv:
         help()
 
 
+if 'create' in argsdict:
+    create_project()
+    exit(0)
+
+if 'create++' in argsdict:
+    create_project('++')
+    exit(0)
+
 if 'i' in argsdict:
     b = Builder(argsdict['i'][0])
 else:
     # check of capul.json
     if not os.path.isfile('capul.json'):
         CPrint.fail("capul.json file not found ")
+        help()
         exit(2)
     b = Builder('capul.json')
 
