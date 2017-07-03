@@ -90,6 +90,8 @@ class Builder(object):
             self.includes = obj['includes']
         if 'libraries' in obj:
             self.libraries = obj['libraries']
+        if 'library_search_paths' in obj:
+            self.library_search_paths = obj['library_search_paths']
         if 'output' in obj:
             self.output = obj['output']
         if 'output_dir' in obj:
@@ -240,25 +242,28 @@ def create_project(prefix=''):
                 'debug': True,
                 'source_extension': '.c%s' % prefix,
                 'run_after_build': True}
-        f.write(json.dumps(data))
+        f.write(json.dumps(data, indent=4, sort_keys=True))
 
 argsdict = {}
 
 for farg in sys.argv:
     try:
         if farg.startswith('--'):
-            (arg, val) = farg.split("=")
-            arg = arg[2:]
-
+            if '=' in farg:
+                (arg, val) = farg.split("=")
+                arg = arg[2:]
+            else:
+                arg = farg[2:]
+                val = ''
             if arg in argsdict:
                 argsdict[arg].append(val)
             else:
                 argsdict[arg] = [val]
         else:
             argsdict[farg] = 1
-    except:
+    except Exception as e:
+        print(e)
         help()
-
 
 if 'create' in argsdict:
     create_project()
