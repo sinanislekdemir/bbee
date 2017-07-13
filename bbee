@@ -10,6 +10,18 @@ import json
 import os
 import subprocess
 import sys
+import collections
+
+
+def convert(data):
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert, data))
+    else:
+        return data
 
 
 # Stolen bcolors from stackowerflow #22886353
@@ -78,6 +90,9 @@ class Builder(object):
         self.debug = False
         self.source_extension = '.c'
         self.run_after_build = False
+        self.install = []
+        if 'install' in obj:
+            self.install = obj['install']
         if 'name' in obj:
             CPrint.header('Project name {}'.format(obj['name']))
         if 'builder' in obj:
@@ -204,6 +219,49 @@ class Builder(object):
         if self.build_type == 'c':
             self.build_c()
 
+    def do_install(self):
+        if not self.install:
+            CPrint.fail("No installation information found for project")
+            return False
+        self.install = convert(self.install)
+        for definition in self.install:
+            _from = definition[0]
+            _to = definition[1]
+            if not isinstance(_from, str):
+                CPrint.fail("First parameter should be a single string")
+                return False
+            if not os.path.exists(_from):
+                CPrint.fail("File or directory not found: [{}]".format(_from))
+                return False
+            if os.path.isdir(_from):
+                _from = os.path.join(_from, ".")
+
+            if isinstance(_to, str):
+                if _to.startswith('!'):
+                    _to = _to[1:]
+                    os.system('mkdir -p "{}"'.format(_to))
+                if os.path.isdir(_to):
+                    print(_from)
+                    os.system('cp -r "{}" "{}"'.format(_from, _to))
+                else:
+                    CPrint.fail("Target directory not found!")
+                    return False
+
+            if isinstance(_to, list):
+                success = False
+                for __to in _to:
+                    if __to.startswith('!'):
+                        __to = __to[1:]
+                        os.system('mkdir -p "{}"'.format(__to))
+                    if os.path.isdir(__to):
+                        print(_from)
+                        os.system('cp -r "{}" "{}"'.format(_from, __to))
+                        success = True
+                        break
+                if not success:
+                    CPrint.fail("All directories failed for installation")
+        return True
+
 
 def help():
     import textwrap
@@ -218,6 +276,7 @@ def help():
         --run only run output without building
         --help show this help text
         --version shows version
+        --install installs the project to system wide
         """))
     exit(0)
 
@@ -240,6 +299,7 @@ def create_project(prefix=''):
                 'output_name': 'example',
                 'cflags': '',
                 'debug': True,
+                'install': [],
                 'source_extension': '.c%s' % prefix,
                 'run_after_build': True}
         f.write(json.dumps(data, indent=4, sort_keys=True))
@@ -289,6 +349,10 @@ if 'help' in argsdict:
 if 'clean' in argsdict:
     b.clean()
     exit(0)
+
+if 'install' in argsdict:
+    res = b.do_install()
+    exit(res)
 
 if 'run' in argsdict:
     b.exec_bin()
