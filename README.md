@@ -3,6 +3,8 @@ Very simple C - C++ Builder
 
 I wrote this little script to help me out with little C or C++ codes.
 
+It basically crawls for sources, compiles and links the objects either to executable binary or to static library. (I love static libraries)
+
 Sometimes I do not want to spend time writing Makefile scripts
 
 thus while sending some sample codes to ppl, I include this.
@@ -12,6 +14,18 @@ This has a little convention so as long as you keep the convention, things will 
 Please note that, I did not wrote this little tiny script for big and complex projects, stick to cmake or autotools if you are planning to write sth complex.
 
 Other than that, this script would do the job for you as well;
+
+## Quick Start
+Simple run the command below to create an empty C project. This will create an empty directory tree with includes, build and source directory as well as a **capul.json** file already configured. You can create your main.c inside source directory and start by calling *bbee* command to compile and run.
+
+    bbee --create
+
+Or run the command below to create an empty C++ project
+
+    bbee --create++
+    
+
+
 
 ## Parameters:
 
