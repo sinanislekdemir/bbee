@@ -16,6 +16,13 @@ Please note that, I did not wrote this little tiny script for big and complex pr
 Other than that, this script would do the job for you as well;
 
 ## Quick Start
+
+### Install
+
+    python setup.py install
+
+Yes, I am too shy to add my package to Python.
+
 Simple run the command below to create an empty C project. This will create an empty directory tree with includes, build and source directory as well as a **capul.json** file already configured. You can create your main.c inside source directory and start by calling *bbee* command to compile and run.
 
     bbee --create
