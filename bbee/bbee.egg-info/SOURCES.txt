@@ -1,0 +1,8 @@
+README.md
+setup.py
+bbee/__init__.py
+bbee.egg-info/PKG-INFO
+bbee.egg-info/SOURCES.txt
+bbee.egg-info/dependency_links.txt
+bbee.egg-info/top_level.txt
+bin/bbee
