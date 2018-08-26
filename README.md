@@ -43,12 +43,13 @@ Or run the command below to create an empty C++ project
 | sources              |                  | list | List of sources (directory or files) | ["./source", "main.c"]               |
 | includes             |                  | list | List of includes (dir or files)      | ["./include", "/usr/local/includes"] |
 | libraries            |                  | list | List of libraries to link            | ["pthread", "GL", "m"]               |
+| frameworks           |                  | list | List of frameworks to link (Mac)     | ["OpenGL", "GLUT"]                   |
 | library_search_paths |                  | list | List of library directories          | ["./libs", "/usr/local/lib"]         |
 | output               | library / binary | str  | Output format, binary exec. or a lib | "binary"                             |
 | output_dir           |                  | str  | Where to put the output file(s)      | "build"                              |
 | output_name          |                  | str  | Output file name                     | "hello_world" or "libmylib.a"        |
 | cflags               |                  | str  | gcc extra flags                      | "-std=gnu99 -Wall -Werror -O3 -g"    | 
-| debug                | true / false     | bool | BBee Debug Mode on / off             | false                                |
+| verbose              | true / false     | bool | BBee Verbose Mode on / off           | false                                |
 | source_extension     |                  | str  | Extension to crawl for compiling     | ".c"                                 |
 | run_after_build      |                  | bool | Run the binary output file after     | false                                |
 | install              |                  | list | List of installation directives      | See below at "how to make install"   |

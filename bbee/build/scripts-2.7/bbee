@@ -23,7 +23,6 @@ def convert(data):
     else:
         return data
 
-
 # Stolen bcolors from stackowerflow #22886353
 class bcolors:
     HEADER = '\033[95m'
@@ -76,51 +75,23 @@ class Builder(object):
         data = f.read()
         f.close()
         obj = json.loads(data)
-        self.builder = 'gcc'
-        self.build_type = 'c'
+        self.builder = obj.get('builder', 'gcc')
+        self.build_type = obj.get('build_type', 'c')
         self.build = obj
-        self.sources = []
-        self.includes = []
-        self.libraries = []
-        self.library_search_paths = []
-        self.output = ''
-        self.output_dir = '.'
-        self.output_name = 'output'
-        self.cflags = ''
-        self.debug = False
-        self.source_extension = '.c'
-        self.run_after_build = False
-        self.install = []
-        if 'install' in obj:
-            self.install = obj['install']
-        if 'name' in obj:
-            CPrint.header('Project name {}'.format(obj['name']))
-        if 'builder' in obj:
-            self.builder = obj['builder']
-        if 'build_type' in obj:
-            self.build_type = obj['build_type']
-        if 'sources' in obj:
-            self.sources = obj['sources']
-        if 'includes' in obj:
-            self.includes = obj['includes']
-        if 'libraries' in obj:
-            self.libraries = obj['libraries']
-        if 'library_search_paths' in obj:
-            self.library_search_paths = obj['library_search_paths']
-        if 'output' in obj:
-            self.output = obj['output']
-        if 'output_dir' in obj:
-            self.output_dir = obj['output_dir']
-        if 'output_name' in obj:
-            self.output_name = obj['output_name']
-        if 'cflags' in obj:
-            self.cflags = obj['cflags']
-        if 'debug' in obj:
-            self.debug = obj['debug']
-        if 'source_extension' in obj:
-            self.source_extension = obj['source_extension']
-        if 'run_after_build' in obj:
-            self.run_after_build = obj['run_after_build']
+        self.sources = obj.get('sources', [])
+        self.includes = obj.get('includes', [])
+        self.libraries = obj.get('libraries', [])
+        self.library_search_paths = obj.get('library_search_paths', [])
+        self.frameworks = obj.get('frameworks', [])
+        self.output = obj.get('output', '')
+        self.output_dir = obj.get('output_dir', '.')
+        self.output_name = obj.get('output_name', 'output')
+        self.cflags = obj.get('cflags', '')
+        self.debug = obj.get('verbose', False)
+        self.source_extension = obj.get('source_extension', '.c')
+        self.run_after_build = obj.get('run_after_build', False)
+        self.install = obj.get('install', [])
+        self.name = obj.get('name', '')
 
     def clean(self):
         files = []
@@ -188,6 +159,8 @@ class Builder(object):
                 command += ' -L"' + lib + '"'
             for lib in self.libraries:
                 command += ' -l' + lib
+            for framework in self.frameworks:
+                command += ' -framework ' + framework
             if self.debug:
                 print("{}".format(command))
             call = subprocess.call(command, shell=True)
@@ -298,8 +271,9 @@ def create_project(prefix=''):
                 'output_dir': 'build',
                 'output_name': 'example',
                 'cflags': '',
-                'debug': True,
+                'verbose': True,
                 'install': [],
+                'frameworks': [],
                 'source_extension': '.c%s' % prefix,
                 'run_after_build': True}
         f.write(json.dumps(data, indent=4, sort_keys=True))
