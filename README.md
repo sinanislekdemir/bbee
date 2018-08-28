@@ -19,9 +19,11 @@ Other than that, this script would do the job for you as well;
 
 ### Install
 
-    python setup.py install
+    pip install bbee
+   
+OR
 
-Yes, I am too shy to add my package to Python.
+    python setup.py install
 
 Simple run the command below to create an empty C project. This will create an empty directory tree with includes, build and source directory as well as a **capul.json** file already configured. You can create your main.c inside source directory and start by calling *bbee* command to compile and run.
 
