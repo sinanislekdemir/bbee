@@ -44,6 +44,7 @@ Description: # bbee
         | sources              |                  | list | List of sources (directory or files) | ["./source", "main.c"]               |
         | includes             |                  | list | List of includes (dir or files)      | ["./include", "/usr/local/includes"] |
         | libraries            |                  | list | List of libraries to link            | ["pthread", "GL", "m"]               |
+        | frameworks           |                  | list | List of frameworks to link (MacOS)   | ["OpenGL", "GLUT"]                   |
         | library_search_paths |                  | list | List of library directories          | ["./libs", "/usr/local/lib"]         |
         | output               | library / binary | str  | Output format, binary exec. or a lib | "binary"                             |
         | output_dir           |                  | str  | Where to put the output file(s)      | "build"                              |
@@ -97,6 +98,10 @@ Description: # bbee
                 ],
                 "library_search_paths": [
                     "/usr/local/lib"
+                ],
+                "frameworks": [
+                    "OpenGL",
+                    "GLUT"
                 ],
                 "output": "binary",
                 "output_dir": "build",
