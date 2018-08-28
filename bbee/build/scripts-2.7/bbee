@@ -8,9 +8,11 @@
 
 import json
 import os
+import stat
 import subprocess
 import sys
 import collections
+from shutil import copyfile
 
 
 def convert(data):
@@ -24,6 +26,8 @@ def convert(data):
         return data
 
 # Stolen bcolors from stackowerflow #22886353
+
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -258,11 +262,34 @@ def create_project(prefix=''):
     os.mkdir('sources')
     os.mkdir('includes')
     os.mkdir('build')
+    # ok drop a copy of bbee to this directory
+    copyfile(sys.argv[0], 'bbee')
+    st = os.stat('bbee')
+    os.chmod('bbee', st.st_mode | stat.S_IEXEC)
     with open('README.md', 'w') as f:
         f.write("# bbee project\n")
+    include = "<stdio.h>"
+    if prefix == "++":
+        include = "<iostream>"
+    code = 'printf("hello from bbee!\\n");'
+    if prefix == "++":
+        code = 'std::cout << "hello from bbee!\\n";'
+    main = """
+#include %s
+int main()
+{
+    %s
+}
+    """ % (include, code)
+    f = open("sources/main.c%s" % prefix, 'w')
+    f.write(main)
+    f.close()
+    cc = "cc"
+    if prefix == "++":
+        cc = "++"
     with open('capul.json', 'w') as f:
         data = {'name': 'Example Project',
-                'builder': 'gcc',
+                'builder': 'g%s' % cc,
                 'sources': ['./sources'],
                 'includes': ['./includes'],
                 'libraries': [],
@@ -277,6 +304,7 @@ def create_project(prefix=''):
                 'source_extension': '.c%s' % prefix,
                 'run_after_build': True}
         f.write(json.dumps(data, indent=4, sort_keys=True))
+
 
 argsdict = {}
 
