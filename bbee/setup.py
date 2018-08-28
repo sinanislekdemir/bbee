@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bbee",
-    version="0.0.2",
+    version="0.0.3",
     author="Sinan Islekdemir",
     author_email="sinan@islekdemir.com",
     scripts=['bin/bbee'],
