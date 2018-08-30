@@ -1,4 +1,4 @@
-#!/usr/local/opt/python@2/bin/python2.7
+#!python
 
 # Simple C builder
 # This project is created for my own compiling requirements
