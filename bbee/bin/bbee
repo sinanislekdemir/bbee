@@ -173,10 +173,11 @@ class Builder(object):
                 command += ' -L"' + lib + '"'
             for lib in self.libraries['common']:
                 command += ' -l' + lib
-            for lib in self.libraries[platform.system()]:
+            for lib in self.libraries[platform.system().lower()]:
                 command += ' -l' + lib
-            for framework in self.frameworks:
-                command += ' -framework ' + framework
+            if platform.system().lower() == 'darwin':
+                for framework in self.frameworks:
+                    command += ' -framework ' + framework
             if self.debug:
                 print("{}".format(command))
             call = subprocess.call(command, shell=True)
