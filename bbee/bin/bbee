@@ -102,9 +102,9 @@ class Builder(object):
         self.name = obj.get('name', '')
         self.libraries = {
             'common': libraries,
-            'Darwin': darwin_libraries,
-            'Linux': linux_libraries,
-            'Windows': windows_libraries
+            'darwin': darwin_libraries,
+            'linux': linux_libraries,
+            'windows': windows_libraries
         }
 
     def clean(self):
