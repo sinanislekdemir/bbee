@@ -1,4 +1,4 @@
-#!/usr/local/opt/python@2/bin/python2.7
+#!python
 
 # Simple C builder
 # This project is created for my own compiling requirements
@@ -12,6 +12,7 @@ import stat
 import subprocess
 import sys
 import collections
+import platform
 from shutil import copyfile
 
 
@@ -84,7 +85,10 @@ class Builder(object):
         self.build = obj
         self.sources = obj.get('sources', [])
         self.includes = obj.get('includes', [])
-        self.libraries = obj.get('libraries', [])
+        libraries = obj.get('libraries', [])
+        linux_libraries = obj.get('linux_libraries', []) # linux specific
+        darwin_libraries = obj.get('darwin_libraries', []) # apple specific
+        windows_libraries = obj.get('windows_libraries', []) # win specific
         self.library_search_paths = obj.get('library_search_paths', [])
         self.frameworks = obj.get('frameworks', [])
         self.output = obj.get('output', '')
@@ -96,6 +100,12 @@ class Builder(object):
         self.run_after_build = obj.get('run_after_build', False)
         self.install = obj.get('install', [])
         self.name = obj.get('name', '')
+        self.libraries = {
+            'common': libraries,
+            'Darwin': darwin_libraries,
+            'Linux': linux_libraries,
+            'Windows': windows_libraries
+        }
 
     def clean(self):
         files = []
@@ -161,7 +171,9 @@ class Builder(object):
             command += ' ' + self.cflags
             for lib in self.library_search_paths:
                 command += ' -L"' + lib + '"'
-            for lib in self.libraries:
+            for lib in self.libraries['common']:
+                command += ' -l' + lib
+            for lib in self.libraries[platform.system()]:
                 command += ' -l' + lib
             for framework in self.frameworks:
                 command += ' -framework ' + framework
@@ -254,6 +266,7 @@ def help():
         --help show this help text
         --version shows version
         --install installs the project to system wide
+        --clean clean pre-built object files
         """))
     exit(0)
 
@@ -293,6 +306,9 @@ int main()
                 'sources': ['./sources'],
                 'includes': ['./includes'],
                 'libraries': [],
+                'linux_libraries': [],
+                'darwin_libraries': [],
+                'windows_libraries': [],
                 'library_search_paths': [],
                 'output': 'binary',
                 'output_dir': 'build',
