@@ -86,9 +86,9 @@ class Builder(object):
         self.sources = obj.get('sources', [])
         self.includes = obj.get('includes', [])
         libraries = obj.get('libraries', [])
-        linux_libraries = obj.get('linux_libraries', []) # linux specific
-        darwin_libraries = obj.get('darwin_libraries', []) # apple specific
-        windows_libraries = obj.get('windows_libraries', []) # win specific
+        linux_libraries = obj.get('linux_libraries', [])  # linux specific
+        darwin_libraries = obj.get('darwin_libraries', [])  # apple specific
+        windows_libraries = obj.get('windows_libraries', [])  # win specific
         self.library_search_paths = obj.get('library_search_paths', [])
         self.frameworks = obj.get('frameworks', [])
         self.output = obj.get('output', '')
@@ -99,6 +99,7 @@ class Builder(object):
         self.source_extension = obj.get('source_extension', '.c')
         self.run_after_build = obj.get('run_after_build', False)
         self.install = obj.get('install', [])
+        self.ar_params = obj.get('ar', 'rcs')
         self.name = obj.get('name', '')
         self.libraries = {
             'common': libraries,
@@ -189,8 +190,8 @@ class Builder(object):
                 self.exec_bin()
 
         if self.output == 'library':
-            command = 'ar -cvq "{}/{}" '.format(self.output_dir,
-                                                self.output_name)
+            command = 'ar {} "{}/{}" '.format(self.ar_params, self.output_dir,
+                                              self.output_name)
             command += ' '.join(obj_files)
             if self.debug:
                 print("{}".format(command))
@@ -315,6 +316,7 @@ int main()
                 'output_dir': 'build',
                 'output_name': 'example',
                 'cflags': '',
+                'ar': 'rcs',
                 'verbose': True,
                 'install': [],
                 'frameworks': [],
